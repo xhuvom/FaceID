@@ -4,6 +4,9 @@
 #include "cuda.h"
 #include <stdio.h>
 #include <math.h>
+#include <cv.h>
+#include <highgui.h>
+#include <stdlib.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -12,14 +15,27 @@
 
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"
+#include "opencv2/videoio/videoio_c.h"
 #include "opencv2/imgproc/imgproc_c.h"
 #endif
-
-
+FILE *fp;
+int imnumber;
 int windows = 0;
-
+int coordxy=0;
+FILE *file;
+   
 float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
 
+/*int arduino_serial(int val)
+{
+
+// Open Arduino serial write
+ file = fopen("/dev/ttyACM0","w");  //Opening device file
+fprintf(file,"%d", val);
+fclose(file);
+return 0;
+}
+*/
 float get_color(int c, int x, int max)
 {
     float ratio = ((float)x/max)*5;
@@ -180,7 +196,7 @@ image **load_alphabet()
 void draw_detections(image im, int num, float thresh, box *boxes, float **probs, char **names, image **alphabet, int classes)
 {
     int i;
-
+char str[100];
     for(i = 0; i < num; ++i){
         int class = max_index(probs[i], classes);
         float prob = probs[i][class];
@@ -192,7 +208,7 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
                 width = pow(prob, 1./2.)*10+1;
                 alphabet = 0;
             }
-
+ 
             printf("%s: %.0f%%\n", names[class], prob*100);
             int offset = class*123457 % classes;
             float red = get_color(2,offset,classes);
@@ -216,9 +232,38 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
+//save_image_jpg(im, "/home/xhuv/darknet_faceID/darknet/scripts/images/su2/su_"); 
 
-            draw_box_width(im, left, top, right, bot, width, red, green, blue);
-            if (alphabet) {
+save_image_jpg(im, "/home/xhuv/darknet_faceID/darknet/scripts/images/smile/smile_");            
+draw_box_width(im, left, top, right, bot, width, red, green, blue);
+	/*int cvSaveImage(const char* filename, const CvArr* image, const int* params=0 ) */
+                
+		
+		 sprintf(str, "/home/xhuv/darknet_faceID/darknet/scripts/annot2/smile/smile_%d.txt", imnumber);
+fp = fopen(str,"w");
+	fprintf(fp, "4\n%d %d %d %d", left, top, right, bot);
+		fclose(fp);  
+          //  draw_box_width(im, left, top, right, bot, width, red, green, blue);
+
+
+//sleep(1);
+printf("Left: %d\tRight:%d\tTop:%d\tBottom:%d\tSumLR:%d\tSumTB:%d\n", left, right, top, bot, left+right,top+bot);
+
+//arduino_serial(left*2);
+/*for(coordxy=0;coordxy <= left;coordxy++)
+{
+printf("-");
+}
+*/
+
+
+  //         	printf("Left: %d \t Right: %d Top: %d \t Bottom: %d \t Width: %d \n", left, right, top, bot, width);
+            
+//sprintf(str, "/home/xhuv/darknet_faceID/darknet/scripts/annot2/su2/su_%d.txt", imnumber);
+//fp = fopen(str,"w");
+//	fprintf(fp, "1\n%d %d %d %d", left, top, right, bot);
+//		fclose(fp);  
+if (alphabet) {
                 image label = get_label(alphabet, names[class], (im.h*.03)/10);
                 draw_label(im, top + width, left, label, rgb);
             }
@@ -513,9 +558,11 @@ void save_image_jpg(image p, const char *name)
     image copy = copy_image(p);
     if(p.c == 3) rgbgr_image(copy);
     int x,y,k;
-
-    char buff[256];
-    sprintf(buff, "%s.jpg", name);
+   char buff[256];
+	     
+	sprintf(buff, "%s_%d.jpg", name, imnumber);
+ 	        
+	imnumber++;
 
     IplImage *disp = cvCreateImage(cvSize(p.w,p.h), IPL_DEPTH_8U, p.c);
     int step = disp->widthStep;
