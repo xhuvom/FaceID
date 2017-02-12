@@ -4,38 +4,42 @@
 #include "cuda.h"
 #include <stdio.h>
 #include <math.h>
-#include <cv.h>
-#include <highgui.h>
-#include <stdlib.h>
-
+#include <sndfile.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+#include <../include/alsa/asoundlib.h>
+#include <stdio.h>
+
+#define PCM_DEVICE "default"
 
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"
 #include "opencv2/videoio/videoio_c.h"
 #include "opencv2/imgproc/imgproc_c.h"
 #endif
-FILE *fp;
-int imnumber;
+//#include <cv.h>
+//#include <highgui.h>
+SNDFILE *sf;
+SF_INFO info;
+static char *device = "default";                        /* playback device */
+snd_output_t *output = NULL;
+unsigned char buffer[1*1024]; 
 int windows = 0;
-int coordxy=0;
 FILE *file;
-   
 float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
 
-/*int arduino_serial(int val)
+/*
+int arduino_serial(int val)
 {
 
 // Open Arduino serial write
- file = fopen("/dev/ttyACM0","w");  //Opening device file
+ file = fopen("/dev/ttyACM1","w");  //Opening device file
 fprintf(file,"%d", val);
 fclose(file);
 return 0;
-}
-*/
+}*/
 float get_color(int c, int x, int max)
 {
     float ratio = ((float)x/max)*5;
@@ -46,6 +50,56 @@ float get_color(int c, int x, int max)
     //printf("%f\n", r);
     return r;
 }
+
+
+int beeper(void)
+
+{
+//IplImage *im = cvLoadImage("warning-sign.png",CV_WINDOW_AUTOSIZE);
+//cvNamedWindow("warning-sign", CV_WINDOW_AUTOSIZE);
+//cvShowImage("warning-sign", im);
+//cvWaitKey(0);
+
+int err;
+            unsigned int i;
+            snd_pcm_t *handle;
+            snd_pcm_sframes_t frames;
+    
+            for (i = 0; i < sizeof(buffer); i++)
+                    buffer[i] = random() & 0xff;
+    
+        if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+            printf("Playback open error: %s\n", snd_strerror(err));
+            exit(EXIT_FAILURE);
+       }
+       if ((err = snd_pcm_set_params(handle,
+                                     SND_PCM_FORMAT_U8,
+                                     SND_PCM_ACCESS_RW_INTERLEAVED,
+                                     1,
+                                      48000,
+                                      1,
+                                      500000)) < 0) {   /* 0.5sec */
+            printf("Playback open error: %s\n", snd_strerror(err));
+            exit(EXIT_FAILURE);
+        }
+    
+            for (i = 0; i < 16; i++) {
+                   frames = snd_pcm_writei(handle, buffer, sizeof(buffer));
+                    if (frames < 0)
+                            frames = snd_pcm_recover(handle, frames, 0);
+                    if (frames < 0) {
+                            printf("snd_pcm_writei failed: %s\n", snd_strerror(frames));
+                            break;
+                   }
+                    if (frames > 0 && frames < (long)sizeof(buffer))
+                            printf("Short write (expected %li, wrote %li)\n", (long)sizeof(buffer), frames);
+            }
+    
+        snd_pcm_close(handle);
+        return 0;
+
+}
+
 
 void composite_image(image source, image dest, int dx, int dy)
 {
@@ -195,8 +249,10 @@ image **load_alphabet()
 
 void draw_detections(image im, int num, float thresh, box *boxes, float **probs, char **names, image **alphabet, int classes)
 {
+int distance=0;
     int i;
-char str[100];
+int area=0;
+int prev[4];
     for(i = 0; i < num; ++i){
         int class = max_index(probs[i], classes);
         float prob = probs[i][class];
@@ -208,8 +264,15 @@ char str[100];
                 width = pow(prob, 1./2.)*10+1;
                 alphabet = 0;
             }
- 
+
             printf("%s: %.0f%%\n", names[class], prob*100);
+/*if(names[class] == "person")
+{
+beeper();
+printf("person detected \n");
+}
+*/
+
             int offset = class*123457 % classes;
             float red = get_color(2,offset,classes);
             float green = get_color(1,offset,classes);
@@ -232,38 +295,39 @@ char str[100];
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
-//save_image_jpg(im, "/home/xhuv/darknet_faceID/darknet/scripts/images/su2/su_"); 
 
-save_image_jpg(im, "/home/xhuv/darknet_faceID/darknet/scripts/images/smile/smile_");            
-draw_box_width(im, left, top, right, bot, width, red, green, blue);
-	/*int cvSaveImage(const char* filename, const CvArr* image, const int* params=0 ) */
-                
-		
-		 sprintf(str, "/home/xhuv/darknet_faceID/darknet/scripts/annot2/smile/smile_%d.txt", imnumber);
-fp = fopen(str,"w");
-	fprintf(fp, "4\n%d %d %d %d", left, top, right, bot);
-		fclose(fp);  
-          //  draw_box_width(im, left, top, right, bot, width, red, green, blue);
+            draw_box_width(im, left, top, right, bot, width, red, green, blue);
 
-
-//sleep(1);
-printf("Left: %d\tRight:%d\tTop:%d\tBottom:%d\tSumLR:%d\tSumTB:%d\n", left, right, top, bot, left+right,top+bot);
-
-//arduino_serial(left*2);
-/*for(coordxy=0;coordxy <= left;coordxy++)
+if((left>350) && (left < 800))
 {
-printf("-");
+
+printf("ALERT !!!\n\n");
+printf("A(lXr) = %d ; A(tXb) = %d\n", left-right, top-bot); 
+printf(" l=%d t=%d r=%d b=%d\n",left, top, right, bot);
+distance=(410-((top+bot)/2))/4;
+printf("\n Distance= %d ft \n", distance);
+if(distance < 0)
+{
+beeper();
 }
+/*
+prev_l=left;
+prev_r=right;
+prev_t=top;
+prev_b=bot;
 */
+}
+ 
+//arduino_serial(2);    
+//if((left > 250) && (left < 450))
+//{
+//beeper();
 
 
-  //         	printf("Left: %d \t Right: %d Top: %d \t Bottom: %d \t Width: %d \n", left, right, top, bot, width);
-            
-//sprintf(str, "/home/xhuv/darknet_faceID/darknet/scripts/annot2/su2/su_%d.txt", imnumber);
-//fp = fopen(str,"w");
-//	fprintf(fp, "1\n%d %d %d %d", left, top, right, bot);
-//		fclose(fp);  
-if (alphabet) {
+//}
+
+
+		if (alphabet) {
                 image label = get_label(alphabet, names[class], (im.h*.03)/10);
                 draw_label(im, top + width, left, label, rgb);
             }
@@ -558,11 +622,9 @@ void save_image_jpg(image p, const char *name)
     image copy = copy_image(p);
     if(p.c == 3) rgbgr_image(copy);
     int x,y,k;
-   char buff[256];
-	     
-	sprintf(buff, "%s_%d.jpg", name, imnumber);
- 	        
-	imnumber++;
+
+    char buff[256];
+    sprintf(buff, "%s.jpg", name);
 
     IplImage *disp = cvCreateImage(cvSize(p.w,p.h), IPL_DEPTH_8U, p.c);
     int step = disp->widthStep;
