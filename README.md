@@ -39,8 +39,10 @@ After preprocessing, modify class numbers accordingly, create face.names and fac
 
 Configure yolo.c file and yolo_kernels, comment the lines on image.c file.
 Now OPENCV=0 and start training with cfg file(modify #224 with filters and class numbers according to the equation > filters = (class+coord+1)*num
+Now start training on GPU. 
 
-### Part 3: Now start training, after about 120k epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy.
+### Part 3 >> Deploy
+After about 120k training epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy.
 
-The same process could be used to recognize facial expressions. The only thing I have added here is the automatic annotation of face images, which is quite cumbersome if done by hand.
+The same process could be used to recognize facial expressions (demo https://www.youtube.com/watch?v=GMy0Zs8LX-o). The only thing I have added here is the automatic annotation of face images, which is quite cumbersome if done by hand.
 Let me know your successful training stories or mail me for further clarification at abushuvom@gmail.com
