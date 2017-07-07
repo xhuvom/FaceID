@@ -219,29 +219,16 @@ char str[100];
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
-//save_image_jpg(im, "/home/xhuv/darknet_faceID/darknet/scripts/images/su2/su_"); 
+		
+save_image_jpg(im, "/home/xhuv/darknetfaceID/darknet/scripts/images/su2/su_"); // change ur own directory
+		
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
 
-
-printf("Left: %d\tRight:%d\tTop:%d\tBottom:%d\tSumLR:%d\tSumTB:%d\n", left, right, top, bot, left+right,top+bot);
-
-/*for(coordxy=0;coordxy <= left;coordxy++)
-{
-printf("-");
-}
-*/
-if((left > 200) && (left < 400))
-{
-fprintf(stdout, "\aBeep!\n" );
-printf("ALERT!!\n");
-}
-
-  //         	printf("Left: %d \t Right: %d Top: %d \t Bottom: %d \t Width: %d \n", left, right, top, bot, width);
-            
-//sprintf(str, "/home/xhuv/darknet_faceID/darknet/scripts/annot2/su2/su_%d.txt", imnumber);
-//fp = fopen(str,"w");
-//	fprintf(fp, "1\n%d %d %d %d", left, top, right, bot);
-//		fclose(fp);  
+         sprintf(str, "/home/xhuv/darknet_faceID/darknet/scripts/annot2/su2/su_%d.txt", imnumber); // change ur desired directory
+	fp = fopen(str,"w");
+	fprintf(fp, "1\n%d %d %d %d", left, top, right, bot); // change class number #1
+		fclose(fp);  
+		
 if (alphabet) {
                 image label = get_label(alphabet, names[class], (im.h*.03)/10);
                 draw_label(im, top + width, left, label, rgb);
