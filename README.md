@@ -18,7 +18,7 @@ Basically its a simple three step process::
 2. Train
 3. Deploy
 
-Part 1: Capture >>
+# Part 1: Capture >>
 [i] To detect face from live camera feed and annotate automatically, use the .cfg and .weight files from QuanHua (https://mega.nz/#F!GRV1XKbJ!v8BCsFO8iJVNppiGXY4qMw). 
 [ii] Only add those lines on image.c file of this fork as described bellow:
 
@@ -29,18 +29,18 @@ Part 1: Capture >>
 About ~2k face images per person is enough to recognize individual faces but to improve accuracy, more data could be added.
 
 
-Part 2: Train>>
+## Part 2: Train>>
 After capturing each persons face images and annotations on separate training folders, some data preprocessing is required for training. 
 Image conversion: Convert jpg images to JPEG for Darknet framework using command [ $ mogrify -format JPEG *jpg ] according to your image data directory.
 
-Label conversion: Convert annotations to VOC data format with convert.py script provided on scripts folder.
+Label conversion: Convert annotations to VOC data format with convert.py script provided on scripts folder. This operation generates training image list file on the same folder for different classes. Add all those training list files into one file and point the file on face.data 
 
 After preprocessing, modify class numbers accordingly, create face.names and face.data files with your desired labels and directories.
 
 Configure yolo.c file and yolo_kernels, comment the lines on image.c file.
 Now OPENCV=0 and start training with cfg file(modify #224 with filters and class numbers according to the equation > filters = (class+coord+1)*num
 
-Part 3: Now start training, after about 120k epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy.
+### Part 3: Now start training, after about 120k epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy.
 
 The same process could be used to recognize facial expressions. The only thing I have added here is the automatic annotation of face images, which is quite cumbersome if done by hand.
 Let me know your successful training stories.
