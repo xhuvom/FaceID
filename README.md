@@ -10,6 +10,9 @@ For questions or issues please use the [Google Group](https://groups.google.com/
 ----------------------YOLO Facial recognition on Darknet Framework-------------------------------------------------
 
 ############## Detecting and recognizing face is a three step process with automatic annotation #####################
+Fork on github: https://github.com/xhuvom/darknetFaceID
+YOLO darknet implementation to detect, recognize and track multiple faces. Yes it can detect and recognize individual faces just by training on different classes. The algorithm automatically learn facial features itself and recognize individual faces. All you need is to train different face images as different classes.
+I have tested 3 different faces trained with ~2k individual images per class. After about 60k epochs, the algorithm works pretty well with acceptable accuracy.Demo video ( https://www.youtube.com/watch?v=UsOi1BfunnU )
 
 Annotating large number of images manually by hand is time-consuming and inefficient for practical prototyping. Thats why I have used the fork https://github.com/quanhua92/darknet/ to detect faces from webcam images and annotate  any number of images automatically.
 
