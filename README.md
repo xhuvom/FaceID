@@ -23,7 +23,7 @@ Basically its a simple three step process::
 
 # Part 1: Capture >>
 [i] To detect face from live camera feed and annotate automatically, use the .cfg and .weight files from QuanHua (https://mega.nz/#F!GRV1XKbJ!v8BCsFO8iJVNppiGXY4qMw). 
-[ii] Only add those lines on image.c file of this fork as described bellow:
+[ii] Only add those lines on src/image.c file of this fork as described bellow:
 
 (line #223) to save .jpg images and (line #227) to save annotations on separate folders for each class (also change class number on line #229 
 
@@ -36,11 +36,11 @@ About ~2k face images per person is enough to recognize individual faces but to 
 After capturing each persons face images and annotations on separate training folders, some data preprocessing is required for training. 
 Image conversion: Convert jpg images to JPEG for Darknet framework using command [ $ mogrify -format JPEG *jpg ] according to your image data directory.
 
-Label conversion: Convert annotations to VOC data format with convert.py script provided on scripts folder. This operation generates training image list file on the same folder for different classes. Add all those training list files into one file and point the file on face.data 
+Label conversion: Convert annotations to VOC data format with scripts/convert.py script provided on scripts folder. This operation generates training image list file on the same folder for different classes. Add all those training list files into one file and point the file on cfg/face.data 
 
-After preprocessing, modify class numbers accordingly, create face.names and face.data files with your desired labels and directories.
+After preprocessing, modify class numbers accordingly, create data/face.names and cfg/face.data files with your desired labels and directories.
 
-Configure yolo.c file and yolo_kernels, comment the lines on image.c file.
+Configure src/yolo.c file and yolo_kernels, comment the lines on src/image.c file.
 Now OPENCV=0 and start training with cfg file(modify #224 with filters and class numbers according to the equation > filters = (class+coord+1)*num
 Now start training on GPU. 
 
