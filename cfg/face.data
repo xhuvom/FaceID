@@ -1,0 +1,7 @@
+classes= 3
+train  = /home/xhuv/darknetFaceID/traindata/train_all.txt
+valid  = coco_testdev
+
+names = data/face.names
+backup = /home/xhuv/yolo/darknet_original/scripts/backup/faceID_322/
+eval=coco
