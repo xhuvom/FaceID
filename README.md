@@ -45,7 +45,7 @@ Now start training with cfg file(modify #224 with filters and class numbers acco
 Now start training on GPU with a pretrained ImageNet mode (download from https://pjreddie.com/media/files/darknet19_448.conv.23 ) and run the command "./darknet detector train cfg/face.data cfg/face.cfg darknet19.448.conv.23" to initiate training. Checkpoint files will be saved on the "backup" directory specified on "face.data" file.
 
 ### Part 3 >> Deploy
-After about 120k training epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy.
+After about 120k training epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy by running the command "./darknet detector demo cfg/face.data cfg/face.cfg your_weight_file.weights"
 
 The same process could be used to recognize facial expressions (demo https://www.youtube.com/watch?v=GMy0Zs8LX-o). The only thing I have added here is the automatic annotation of face images, which is quite cumbersome if done by hand.
 Let me know your successful training stories or mail me for further clarification at abushuvom@gmail.com
