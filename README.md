@@ -40,9 +40,9 @@ Label conversion: Convert annotations to VOC data format with scripts/convert.py
 
 After preprocessing, modify class numbers accordingly, create data/face.names and cfg/face.data files with your desired labels and directories.
 
-Configure src/yolo.c file and yolo_kernels, comment the lines on src/image.c file.
-Now OPENCV=0 and start training with cfg file(modify #224 with filters and class numbers according to the equation > filters = (class+coord+1)*num
-Now start training on GPU. 
+Configure src/yolo.c file and yolo_kernels, with "CLASS_NUM" parameter according to your class numbers. Comment the lines (#223 & #227) on "src/image.c" file.
+Now start training with cfg file(modify #224 with filters and class numbers according to the equation > filters = (class+coord+1)*num
+Now start training on GPU with a pretrained ImageNet mode (download from https://pjreddie.com/media/files/darknet19_448.conv.23 ) and run the command "./darknet detector train cfg/face.data cfg/face.cfg darknet19.448.conv.23" to initiate training. Checkpoint files will be saved on the "backup" directory specified on "face.data" file.
 
 ### Part 3 >> Deploy
 After about 120k training epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy.
