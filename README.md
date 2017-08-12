@@ -40,7 +40,7 @@ Label conversion: Convert annotations to VOC data format with scripts/convert.py
 
 After preprocessing, modify class numbers accordingly, create data/face.names and cfg/face.data files with your desired labels and directories.
 
-Configure src/yolo.c file and yolo_kernels, with "CLASS_NUM" parameter according to your class numbers. Comment the lines (#223 & #227) on "src/image.c" file.
+Configure src/yolo.c file and yolo_kernels, with "CLASS_NUM" parameter according to your class numbers. Comment the lines (#223 & #227) on "src/image.c" file as we are not gonna overwrite the dataset of the images captured.
 
 Now prepare for training with a cfg file (modify #224 with filters and class numbers according to the equation > [filters = (class+coord+1)*num] for example you can modify the "yolo_face.cfg" file according to your parameters.
 
