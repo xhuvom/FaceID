@@ -57,6 +57,7 @@ image collapse_images_vert(image *ims, int n);
 void show_image(image p, const char *name);
 void show_image_normalized(image im, const char *name);
 void save_image_png(image im, const char *name);
+void save_image_jpg(image im, const char *name);
 void save_image(image p, const char *name);
 void show_images(image *ims, int n, char *window);
 void show_image_layers(image p, char *name);
