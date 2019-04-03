@@ -50,4 +50,3 @@ Now start training on GPU with a pretrained ImageNet mode (download from https:/
 After about 120k training epochs, the training weight files now should successfully detect and recognize individual faces with acceptable accuracy by running the command "./darknet detector demo cfg/face.data cfg/face.cfg your_weight_file.weights"
 
 The same process could be used to recognize facial expressions (demo https://www.youtube.com/watch?v=GMy0Zs8LX-o). The only thing I have added here is the automatic annotation of face images, which is quite cumbersome if done by hand.
-Let me know your successful training stories or mail me for further clarification at abushuvom@gmail.com
